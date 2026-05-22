@@ -7,13 +7,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model WeatherSearch {
-  id          Int      @id @default(autoincrement())
-  city        String
-  country     String
-  temperature Float
-  condition   String
-  humidity    Int
-  windKph     Float
-  searchedAt  DateTime @default(now())
+model WeatherQuery {
+  id          Int                  @id @default(autoincrement())
+  location    String
+  startDate   DateTime
+  endDate     DateTime
+  createdAt   DateTime             @default(now())
+  results     WeatherQueryResult[]
+}
+
+model WeatherQueryResult {
+  id            Int          @id @default(autoincrement())
+  queryId       Int
+  query         WeatherQuery @relation(fields: [queryId], references: [id], onDelete: Cascade)
+  date          DateTime
+  temperature   Float
+  minTemp       Float?
+  maxTemp       Float?
+  condition     String
+  icon          String?
+  humidity      Int?
+  windKph       Float?
 }

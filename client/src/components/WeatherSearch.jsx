@@ -30,6 +30,32 @@ function WeatherSearch() {
         }
     };
 
+    const getCurrentLocationWeather = () => {
+        navigator.geolocation.getCurrentPosition(
+            async (position) => {
+                try {
+                    setLoading(true);
+                    setError("");
+
+                    const { latitude, longitude } = position.coords;
+
+                    const response = await axios.get(
+                        `http://localhost:5000/weather/${latitude},${longitude}`
+                    );
+
+                    setWeather(response.data);
+                } catch (error) {
+                    setError("Failed to fetch current location weather.");
+                } finally {
+                    setLoading(false);
+                }
+            },
+            () => {
+                setError("Location access denied.");
+            }
+        );
+    };
+
     return (
         <div>
             <h2>Search Weather</h2>
@@ -41,9 +67,12 @@ function WeatherSearch() {
                 onChange={(e) => setCity(e.target.value)}
             />
 
-            <button onClick={fetchWeather}>Search</button>
-
+            <button disabled={loading} onClick={fetchWeather}>Search</button>
+            <button disabled={loading} onClick={getCurrentLocationWeather}>
+                Use My Location
+            </button>
             {loading && <p>Loading weather data...</p>}
+            
 
             {error && <p>{error}</p>}
             {weather && (

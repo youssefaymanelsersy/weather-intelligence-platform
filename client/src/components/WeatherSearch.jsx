@@ -72,7 +72,7 @@ function WeatherSearch() {
                 Use My Location
             </button>
             {loading && <p>Loading weather data...</p>}
-            
+
 
             {error && <p>{error}</p>}
             {weather && (
@@ -87,6 +87,26 @@ function WeatherSearch() {
                     <p>Wind Speed: {weather.windKph} kph</p>
 
                     <img src={weather.icon} alt={weather.condition} />
+                </div>
+            )}
+            {weather?.forecast && (
+                <div>
+                    <h2>5-Day Forecast</h2>
+
+                    {weather.forecast.map((day, index) => (
+                        <div key={index}>
+                            <p>{day.date}</p>
+                            <p>
+                                {day.maxTemp}°C / {day.minTemp}°C
+                            </p>
+                            <p>{day.condition}</p>
+
+                            <img
+                                src={`https:${day.icon}`}
+                                alt={day.condition}
+                            />
+                        </div>
+                    ))}
                 </div>
             )}
         </div>

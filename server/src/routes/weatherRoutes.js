@@ -10,7 +10,7 @@ router.get("/:city", async (req, res) => {
     const apiKey = process.env.WEATHER_API_KEY;
 
     const response = await axios.get(
-      `http://api.weatherapi.com/v1/current.json?key=${apiKey}&q=${city}&aqi=yes`,
+      `http://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&aqi=yes&days=5`,
     );
 
     const weatherData = {
@@ -34,6 +34,13 @@ router.get("/:city", async (req, res) => {
         o3: response.data.current.air_quality.o3,
         pm2_5: response.data.current.air_quality.pm2_5,
       },
+      forecast: response.data.forecast.forecastday.map((day) => ({
+        date: day.date,
+        maxTemp: day.day.maxtemp_c,
+        minTemp: day.day.mintemp_c,
+        condition: day.day.condition.text,
+        icon: day.day.condition.icon,
+      })),
     };
 
     res.json(weatherData);

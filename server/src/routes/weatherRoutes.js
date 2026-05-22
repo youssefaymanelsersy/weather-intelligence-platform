@@ -1,5 +1,6 @@
 import express from "express";
 import axios from "axios";
+import prisma from "../config/prisma.js";
 
 const router = express.Router();
 
@@ -42,6 +43,18 @@ router.get("/:city", async (req, res) => {
         icon: day.day.condition.icon,
       })),
     };
+
+    // Save to Supabase
+    await prisma.weatherSearch.create({
+      data: {
+        city: weatherData.city,
+        country: weatherData.country,
+        temperature: weatherData.temperature,
+        condition: weatherData.condition,
+        humidity: weatherData.humidity,
+        windKph: weatherData.windKph,
+      },
+    });
 
     res.json(weatherData);
   } catch (error) {

@@ -2,6 +2,7 @@ import express from "express";
 import axios from "axios";
 import prisma from "../config/prisma.js";
 import { createClient } from "redis";
+import { requireAuth } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 const apiKey = process.env.WEATHER_API_KEY;
@@ -27,7 +28,7 @@ let redisClient = null;
   }
 })();
 
-router.post("/query", async (req, res) => {
+router.post("/query", requireAuth, async (req, res) => {
   try {
     const { location, startDate, endDate } = req.body;
 
@@ -75,6 +76,7 @@ router.post("/query", async (req, res) => {
         location: weatherData.location.name,
         startDate: new Date(startDate),
         endDate: new Date(endDate),
+        userId: req.userId,
         results: {
           create: weatherData.forecast.forecastday.map((day) => ({
             date: new Date(day.date),
@@ -100,9 +102,10 @@ router.post("/query", async (req, res) => {
   }
 });
 
-router.get("/history", async (req, res) => {
+router.get("/history", requireAuth, async (req, res) => {
   try {
     const queries = await prisma.weatherQuery.findMany({
+      where: { userId: req.userId },
       orderBy: { createdAt: "desc" },
       include: { results: true },
     });
@@ -131,9 +134,14 @@ router.put("/results/:id", async (req, res) => {
   }
 });
 
-router.delete("/query/:id", async (req, res) => {
+router.delete("/query/:id", requireAuth, async (req, res) => {
   try {
     const { id } = req.params;
+
+    const query = await prisma.weatherQuery.findUnique({ where: { id: parseInt(id) }});
+    if (!query || query.userId !== req.userId) {
+      return res.status(404).json({ message: "Query not found" });
+    }
 
     await prisma.weatherQuery.delete({
       where: { id: parseInt(id) },
@@ -145,9 +153,10 @@ router.delete("/query/:id", async (req, res) => {
   }
 });
 
-router.get("/export/csv", async (req, res) => {
+router.get("/export/csv", requireAuth, async (req, res) => {
   try {
     const queries = await prisma.weatherQuery.findMany({
+      where: { userId: req.userId },
       include: { results: true },
     });
 
@@ -167,9 +176,10 @@ router.get("/export/csv", async (req, res) => {
   }
 });
 
-router.get("/export/json", async (req, res) => {
+router.get("/export/json", requireAuth, async (req, res) => {
   try {
     const queries = await prisma.weatherQuery.findMany({
+      where: { userId: req.userId },
       include: { results: true },
     });
     res.header('Content-Type', 'application/json');

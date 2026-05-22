@@ -7,12 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  name      String
+  queries   WeatherQuery[]
+  createdAt DateTime @default(now())
+}
+
 model WeatherQuery {
   id          Int                  @id @default(autoincrement())
   location    String
   startDate   DateTime
   endDate     DateTime
   createdAt   DateTime             @default(now())
+  userId      Int
+  user        User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   results     WeatherQueryResult[]
 }
 

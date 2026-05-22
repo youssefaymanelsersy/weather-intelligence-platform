@@ -4,14 +4,29 @@ import axios from "axios";
 function WeatherSearch() {
     const [city, setCity] = useState("");
     const [weather, setWeather] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
     const fetchWeather = async () => {
+        if (!city.trim()) {
+            setError("Please enter a city name.");
+            return;
+        }
+
         try {
-            const response = await axios.get(`http://localhost:5000/weather/${city}`);
+            setLoading(true);
+            setError("");
+
+            const response = await axios.get(
+                `http://localhost:5000/weather/${city}`
+            );
 
             setWeather(response.data);
         } catch (error) {
-            console.error("Error fetching weather:", error);
+            setError("Failed to fetch weather data.");
+            setWeather(null);
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -28,6 +43,9 @@ function WeatherSearch() {
 
             <button onClick={fetchWeather}>Search</button>
 
+            {loading && <p>Loading weather data...</p>}
+
+            {error && <p>{error}</p>}
             {weather && (
                 <div>
                     <h3>

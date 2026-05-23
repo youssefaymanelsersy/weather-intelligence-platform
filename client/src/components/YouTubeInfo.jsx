@@ -5,13 +5,15 @@ export default function YouTubeInfo({ locationName }) {
   const [videoId, setVideoId] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   useEffect(() => {
     if (!locationName) return;
 
     const fetchVideo = async () => {
-      setLoading(true);
       try {
-        const res = await axios.get(`http://localhost:5000/weather/youtube/${encodeURIComponent(locationName)}`);
+        setLoading(true);
+        const res = await axios.get(`${API_URL}/weather/youtube/${encodeURIComponent(locationName)}`);
         setVideoId(res.data.videoId);
       } catch (err) {
         setVideoId(null);

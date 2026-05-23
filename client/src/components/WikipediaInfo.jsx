@@ -5,13 +5,15 @@ export default function WikipediaInfo({ locationName }) {
   const [info, setInfo] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
   useEffect(() => {
     if (!locationName) return;
 
     const fetchInfo = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`http://localhost:5000/weather/info/${locationName}`);
+        const res = await axios.get(`${API_URL}/weather/info/${locationName}`);
         setInfo(res.data);
       } catch (err) {
         setInfo(null);

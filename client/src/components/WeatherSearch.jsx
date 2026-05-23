@@ -1,6 +1,8 @@
 import { useState } from "react";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+
 function WeatherSearch() {
     const [city, setCity] = useState("");
     const [weather, setWeather] = useState(null);
@@ -18,7 +20,7 @@ function WeatherSearch() {
             setError("");
 
             const response = await axios.get(
-                `http://localhost:5000/weather/${city}`
+                `${API_URL}/weather/${city}`
             );
 
             setWeather(response.data);
@@ -40,7 +42,7 @@ function WeatherSearch() {
                     const { latitude, longitude } = position.coords;
 
                     const response = await axios.get(
-                        `http://localhost:5000/weather/${latitude},${longitude}`
+                        `${API_URL}/weather/${latitude},${longitude}`
                     );
 
                     setWeather(response.data);

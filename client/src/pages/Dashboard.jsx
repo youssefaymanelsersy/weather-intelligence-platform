@@ -90,6 +90,7 @@ export default function Dashboard() {
         endDate
       });
       setWeatherData(res.data);
+      setLocation(res.data.location); // Update the input field and map to the fully resolved city name
       fetchHistory(); // Refresh history
       showToast(`Successfully fetched weather for ${res.data.location}`, "success");
     } catch (err) {

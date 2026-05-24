@@ -1,7 +1,7 @@
 import React, { useState, useContext } from 'react';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { CloudSun, Lock, Mail, User } from 'lucide-react';
+import { Cloud, Lock, Mail, User } from 'lucide-react';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -40,15 +40,15 @@ export default function AuthPage() {
         <div className="absolute top-0 right-0 -mr-16 -mt-16 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl"></div>
         <div className="absolute bottom-0 left-0 -ml-16 -mb-16 w-32 h-32 bg-purple-500/20 rounded-full blur-2xl"></div>
 
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center p-3 bg-blue-500/20 rounded-2xl mb-4 ring-1 ring-blue-500/50 shadow-[0_0_15px_rgba(59,130,246,0.3)]">
-            <CloudSun className="w-12 h-12 text-blue-400" />
+        <div className="relative z-10 text-center mb-8">
+          <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-blue-500/10 mb-4">
+            <Cloud className="w-8 h-8 text-blue-400" />
           </div>
-          <h1 className="text-3xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent">
-            SkyCast
+          <h1 className="text-3xl font-bold text-white mb-2">
+            Weather Intelligence
           </h1>
-          <p className="text-slate-400 mt-2 text-sm font-medium">
-            Advanced Meteorological Intelligence
+          <p className="text-slate-400">
+            {isLogin ? 'Sign in to view your dashboard' : 'Create an account to track weather data'}
           </p>
         </div>
 

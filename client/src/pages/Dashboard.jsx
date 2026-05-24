@@ -5,7 +5,7 @@ import LocationMap from '../components/LocationMap';
 import WeatherChart from '../components/WeatherChart';
 import WikipediaInfo from '../components/WikipediaInfo';
 import YouTubeInfo from '../components/YouTubeInfo';
-import { CloudSun, Trash2, DownloadCloud, Search, Navigation, LogOut } from 'lucide-react';
+import { Cloud, Trash2, DownloadCloud, Search, Navigation, LogOut } from 'lucide-react';
 import '../index.css';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
@@ -150,8 +150,8 @@ export default function Dashboard() {
         <header className="pt-10 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="text-center md:text-left">
             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight bg-gradient-to-r from-blue-400 to-cyan-300 bg-clip-text text-transparent flex items-center justify-center md:justify-start gap-4 pb-2">
-              <CloudSun className="w-12 h-12 text-blue-400" />
-              SkyCast
+              <Cloud className="w-12 h-12 text-blue-400" />
+              Weather Intelligence
             </h1>
             <p className="mt-2 text-slate-400 max-w-2xl">
               Advanced meteorological analysis with interactive mapping, Wikipedia insights, and comprehensive historical tracking.
@@ -252,7 +252,7 @@ export default function Dashboard() {
               </div>
             ) : (
               <div className="h-full min-h-[400px] border-2 border-dashed border-white/10 rounded-2xl flex flex-col items-center justify-center text-slate-500 bg-white/5 backdrop-blur-sm">
-                <CloudSun className="w-16 h-16 mb-4 opacity-50 text-blue-400" />
+                <Cloud className="w-16 h-16 mb-4 opacity-50" />
                 <p>Run a query to see the meteorological analysis</p>
               </div>
             )}

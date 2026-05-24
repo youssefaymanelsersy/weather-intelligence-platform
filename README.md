@@ -1,5 +1,7 @@
 # Weather Intelligence Platform
 
+**🚀 Live Demo:** [https://weather-intelligence-platform.vercel.app](https://weather-intelligence-platform.vercel.app)
+
 An advanced full-stack weather analysis platform built with React, Node.js, Express, PostgreSQL, Prisma, and Redis. Features interactive maps, Wikipedia insights, YouTube embedding, secure JWT authentication, and historical search data exporting.
 
 ## Tech Stack
@@ -57,7 +59,7 @@ Render is an excellent platform for hosting Node.js servers and PostgreSQL datab
    * **Build Command**: `npm install` (The `postinstall` script in package.json will automatically run `prisma generate`)
    * **Start Command**: `npm start` (Runs `node src/server.js`)
 4. **Environment Variables**: Add your `DATABASE_URL`, `WEATHER_API_KEY`, and `JWT_SECRET`.
-5. Deploy! Once deployed, copy your new backend URL (e.g. `https://weather-backend.onrender.com`).
+5. Deploy! Once deployed, copy your new backend URL (e.g. `https://weather-intelligence-platform.onrender.com`).
 
 ### 2. Deploying the Frontend (Vercel)
 Vercel is the easiest way to deploy Vite React apps.
@@ -65,8 +67,8 @@ Vercel is the easiest way to deploy Vite React apps.
 2. Set the Root Directory to `client`.
 3. Vercel will auto-detect the Vite framework.
 4. **Environment Variables**: Add a new environment variable:
-   * `VITE_API_URL` = `https://weather-backend.onrender.com` (Your Render URL)
-5. Deploy! The `vercel.json` file is already configured to handle React Router client-side routing.
+   * `VITE_API_URL` = `/api`
+5. Deploy! The `vercel.json` file is already configured to automatically proxy `/api` requests to your Render backend to prevent CORS and SameSite cookie issues.
 
 ---
 *Developed by Youssef Ayman*

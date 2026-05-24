@@ -18,6 +18,8 @@ export default function Dashboard() {
   const [weatherData, setWeatherData] = useState(null);
   const [history, setHistory] = useState([]);
   const [toastMessage, setToastMessage] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [locationLoading, setLocationLoading] = useState(false);
 
   const showToast = (msg, type = "info") => {
     setToastMessage({ msg, type });
@@ -56,12 +58,13 @@ export default function Dashboard() {
       showToast("Geolocation is not supported by your browser", "error");
       return;
     }
+    setLocationLoading(true);
     showToast("Finding your location...", "info");
     navigator.geolocation.getCurrentPosition(async (position) => {
       try {
         const { latitude, longitude } = position.coords;
         const res = await axios.get(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`);
-        const city = res.data.address.city || res.data.address.town || res.data.address.village || res.data.address.country;
+        const city = res.data?.address?.city || res.data?.address?.town || res.data?.address?.village || res.data?.address?.state || res.data?.address?.country;
         if (city) {
           setLocation(city);
           showToast(`Location set to ${city}!`, "success");
@@ -70,9 +73,12 @@ export default function Dashboard() {
         }
       } catch (err) {
         showToast("Failed to geocode your location", "error");
+      } finally {
+        setLocationLoading(false);
       }
     }, () => {
-      showToast("Unable to retrieve your location", "error");
+      setLocationLoading(false);
+      showToast("Unable to retrieve your location. Please check browser permissions.", "error");
     });
   };
 
@@ -82,8 +88,11 @@ export default function Dashboard() {
       showToast("Please fill in all fields", "error");
       return;
     }
+    
+    if (loading) return;
 
     try {
+      setLoading(true);
       const res = await axios.post(`${API_URL}/weather/query`, {
         location,
         startDate,
@@ -95,7 +104,23 @@ export default function Dashboard() {
       showToast(`Successfully fetched weather for ${res.data.location}`, "success");
     } catch (err) {
       showToast(err.response?.data?.message || "Something went wrong.", "error");
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const loadHistoryItem = (item) => {
+    setWeatherData({
+      location: item.location,
+      startDate: item.startDate,
+      endDate: item.endDate,
+      results: item.results
+    });
+    setLocation(item.location);
+    setStartDate(new Date(item.startDate).toISOString().split('T')[0]);
+    setEndDate(new Date(item.endDate).toISOString().split('T')[0]);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    showToast(`Loaded historical data for ${item.location}`, "success");
   };
 
   const handleLocationSelect = (city) => {
@@ -189,8 +214,8 @@ export default function Dashboard() {
                     onChange={(e) => setLocation(e.target.value)} 
                     className="flex-1 px-4 py-2 rounded-md bg-black/20 border border-white/10 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
-                  <button type="button" onClick={handleUseMyLocation} className="px-3 py-2 rounded-md bg-white/10 hover:bg-white/20 transition-colors border border-white/10" title="Use Current Location">
-                    <Navigation className="w-5 h-5 text-blue-400" />
+                  <button type="button" onClick={handleUseMyLocation} disabled={locationLoading} className={`px-3 py-2 rounded-md bg-white/10 hover:bg-white/20 transition-colors border border-white/10 ${locationLoading ? 'opacity-50 cursor-not-allowed' : ''}`} title="Use Current Location">
+                    <Navigation className={`w-5 h-5 text-blue-400 ${locationLoading ? 'animate-pulse' : ''}`} />
                   </button>
                 </div>
               </div>
@@ -221,9 +246,9 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <button type="submit" className="w-full py-2 px-4 rounded-md bg-blue-600 hover:bg-blue-500 text-white font-semibold flex items-center justify-center gap-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500">
-                <Search className="w-4 h-4" />
-                Analyze Weather
+              <button type="submit" disabled={loading} className={`w-full py-2 px-4 rounded-md bg-blue-600 text-white font-semibold flex items-center justify-center gap-2 transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:bg-blue-500'}`}>
+                {loading ? <div className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : <Search className="w-4 h-4" />}
+                {loading ? 'Analyzing...' : 'Analyze Weather'}
               </button>
             </form>
 
@@ -288,14 +313,14 @@ export default function Dashboard() {
               <p className="text-slate-400">No history found. Create your first query above.</p>
             ) : (
               history.map((item) => (
-                <div key={item.id} className="flex justify-between items-center p-4 bg-black/20 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
-                  <div>
-                    <h4 className="font-semibold text-white">{item.location}</h4>
+                <div key={item.id} className="flex justify-between items-center p-4 bg-black/20 rounded-xl border border-white/5 hover:border-white/20 transition-colors group">
+                  <div className="cursor-pointer flex-1" onClick={() => loadHistoryItem(item)}>
+                    <h4 className="font-semibold text-white group-hover:text-blue-400 transition-colors">{item.location}</h4>
                     <p className="text-sm text-slate-400">
                       {new Date(item.startDate).toLocaleDateString()} - {new Date(item.endDate).toLocaleDateString()}
                     </p>
                   </div>
-                  <button onClick={() => handleDelete(item.id)} className="p-2 rounded-md text-red-400 hover:text-red-300 hover:bg-red-400/10 transition-colors">
+                  <button onClick={() => handleDelete(item.id)} className="p-2 rounded-md text-slate-500 hover:text-red-400 hover:bg-red-400/10 transition-colors ml-4">
                     <Trash2 className="w-5 h-5" />
                   </button>
                 </div>

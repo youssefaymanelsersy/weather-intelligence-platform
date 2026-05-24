@@ -9,6 +9,7 @@ export default function AuthPage() {
   const { login } = useContext(AuthContext);
   const [isLogin, setIsLogin] = useState(true);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   
   const [formData, setFormData] = useState({
     name: '',
@@ -18,13 +19,16 @@ export default function AuthPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (loading) return;
     setError(null);
     try {
+      setLoading(true);
       const endpoint = isLogin ? '/auth/login' : '/auth/register';
       const res = await axios.post(`${API_URL}${endpoint}`, formData);
       login(res.data.token, res.data.user);
     } catch (err) {
       setError(err.response?.data?.message || 'Authentication failed. Please try again.');
+      setLoading(false);
     }
   };
 
@@ -74,6 +78,7 @@ export default function AuthPage() {
                   onChange={handleChange}
                   className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                   placeholder="John Doe"
+                  autoComplete="name"
                 />
               </div>
             </div>
@@ -93,6 +98,7 @@ export default function AuthPage() {
                 onChange={handleChange}
                 className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                 placeholder="you@example.com"
+                autoComplete="email"
               />
             </div>
           </div>
@@ -111,15 +117,18 @@ export default function AuthPage() {
                 onChange={handleChange}
                 className="w-full bg-slate-800/50 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-blue-500/50 transition-all"
                 placeholder="••••••••"
+                autoComplete={isLogin ? "current-password" : "new-password"}
               />
             </div>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all active:scale-95"
+            disabled={loading}
+            className={`w-full bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-bold py-3 px-4 rounded-xl shadow-lg transition-all flex items-center justify-center gap-2 ${loading ? 'opacity-70 cursor-not-allowed' : 'hover:from-blue-500 hover:to-cyan-400 active:scale-95'}`}
           >
-            {isLogin ? 'Sign In' : 'Create Account'}
+            {loading ? <div className="w-5 h-5 border-2 border-white/20 border-t-white rounded-full animate-spin" /> : null}
+            {loading ? 'Processing...' : (isLogin ? 'Sign In' : 'Create Account')}
           </button>
         </form>
 

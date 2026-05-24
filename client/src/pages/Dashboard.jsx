@@ -129,6 +129,7 @@ export default function Dashboard() {
   };
 
   const handleDelete = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this weather query from your history?")) return;
     try {
       await axios.delete(`${API_URL}/weather/query/${id}`);
       fetchHistory(); // Refresh list
